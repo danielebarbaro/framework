@@ -39,6 +39,27 @@ class ImageManagerTest extends TestCase
         $this->assertSame('gd', $manager->getDefaultDriver());
     }
 
+    public function test_default_driver_throws_when_legacy_configuration_file_is_present()
+    {
+        $app = $this->makeApp(['image.default' => 'imagick']);
+
+        $manager = new ImageManager($app);
+
+        $this->expectException(ImageException::class);
+        $this->expectExceptionMessage('The "config/image.php" configuration file has been renamed to "config/images.php".');
+
+        $manager->getDefaultDriver();
+    }
+
+    public function test_default_driver_ignores_legacy_configuration_file_when_current_one_is_present()
+    {
+        $app = $this->makeApp(['images.default' => 'gd', 'image.default' => 'imagick']);
+
+        $manager = new ImageManager($app);
+
+        $this->assertSame('gd', $manager->getDefaultDriver());
+    }
+
     public function test_extend_registers_custom_driver()
     {
         $app = $this->makeApp(['images.default' => 'custom']);

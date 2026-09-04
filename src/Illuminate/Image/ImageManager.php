@@ -165,6 +165,14 @@ class ImageManager extends Manager
      */
     public function getDefaultDriver(): string
     {
-        return $this->config->get('images.default', 'gd');
+        if (! is_null($driver = $this->config->get('images.default'))) {
+            return $driver;
+        }
+
+        if (! is_null($this->config->get('image.default'))) {
+            throw new ImageException('The "config/image.php" configuration file has been renamed to "config/images.php". Please rename the configuration file in your application.');
+        }
+
+        return 'gd';
     }
 }
